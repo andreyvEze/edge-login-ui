@@ -26,7 +26,7 @@ type StateProps = {
 }
 
 type DispatchProps = {
-  getQuestions(username: string): Promise<string | void>,
+  getQuestions(username: string): Promise<true>,
   goBack(): void,
   onCancel(): void,
   submit(string[]): void,
@@ -79,7 +79,7 @@ class RecoveryLoginScreenComponent extends React.Component<Props, State> {
         />
       ))
 
-      if (!result) {
+      if (result == null) {
         this.props.goBack()
       }
     }

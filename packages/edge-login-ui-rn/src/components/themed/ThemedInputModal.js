@@ -3,35 +3,39 @@
 import * as React from 'react'
 import { type AirshipBridge } from 'react-native-airship'
 
-import s from '../../common/locales/strings.js'
 import { type ThemeProps, withTheme } from '../services/ThemeContext.js'
 import { EdgeTextField } from './EdgeTextField.js'
-import { ModalMessage, ModalTitle } from './ModalParts.js'
-import { PrimaryButton, SecondaryButton } from './ThemedButtons.js'
+import { ModalCloseArrow, ModalMessage, ModalTitle } from './ModalParts.js'
+import { PrimaryButton } from './ThemedButtons.js'
 import { ThemedModal } from './ThemedModal.js'
 
-type OwnProps = {
-  bridge: AirshipBridge<string | void>,
+type OwnProps<T> = {
+  bridge: AirshipBridge<T | void>,
   buttonLabel: string,
   inputLabel: string,
   message: string,
   isInputPassword?: boolean,
-  onSubmit(inputText: string): Promise<string | void>,
+  onSubmit(inputText: string): Promise<T>,
   title: string
 }
 
 type State = {
   input: string,
-  error?: string
+  error?: string,
+  spinning: boolean
 }
 
-type Props = OwnProps & ThemeProps
+type Props<T> = OwnProps<T> & ThemeProps
 
-class ThemedInputModalComponent extends React.PureComponent<Props, State> {
-  constructor(props: Props) {
+class ThemedInputModalComponent<T> extends React.PureComponent<
+  Props<T>,
+  State
+> {
+  constructor(props: Props<T>) {
     super(props)
     this.state = {
-      input: ''
+      input: '',
+      spinning: false
     }
   }
 
@@ -41,16 +45,12 @@ class ThemedInputModalComponent extends React.PureComponent<Props, State> {
 
   handleSubmit = () => {
     const { onSubmit, bridge } = this.props
-    this.setState({ error: undefined })
+    this.setState({ error: undefined, spinning: true })
+
     onSubmit(this.state.input)
-      .then((result: string | void) => {
-        if (result) {
-          bridge.resolve(result)
-        }
-      })
+      .then(bridge.resolve)
       .catch(error => {
-        this.setState({ error: error.message })
-        console.log(error)
+        this.setState({ error: error.message, spinning: false })
       })
   }
 
@@ -63,7 +63,7 @@ class ThemedInputModalComponent extends React.PureComponent<Props, State> {
       isInputPassword,
       title
     } = this.props
-    const { error, input } = this.state
+    const { error, input, spinning } = this.state
     const close = () => bridge.resolve()
     return (
       <ThemedModal bridge={bridge} onCancel={close}>
@@ -80,16 +80,16 @@ class ThemedInputModalComponent extends React.PureComponent<Props, State> {
           returnKeyType="go"
           secureTextEntry={isInputPassword}
         />
-        <PrimaryButton
-          label={buttonLabel}
-          onPress={this.handleSubmit}
-          marginRem={0.5}
-        />
-        <SecondaryButton
-          label={s.strings.cancel}
-          onPress={close}
-          marginRem={0.5}
-        />
+        {spinning ? (
+          <PrimaryButton spinning />
+        ) : (
+          <PrimaryButton
+            label={buttonLabel}
+            onPress={this.handleSubmit}
+            marginRem={0.5}
+          />
+        )}
+        <ModalCloseArrow />
       </ThemedModal>
     )
   }

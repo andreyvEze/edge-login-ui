@@ -1,5 +1,6 @@
 // @flow
 
+import { type EdgeContext } from 'edge-core-js'
 import { type Reducer, combineReducers } from 'redux'
 
 import { type Action } from '../types/ReduxTypes.js'
@@ -18,6 +19,7 @@ import { type TermsState, terms } from './TermsAndConditinsReducer'
 import { type WorkflowState, workflow } from './WorkflowReducer'
 
 export type RootState = {
+  context: EdgeContext,
   create: CreateState,
   login: LoginState,
   passwordRecovery: PasswordRecoveryState,
@@ -31,6 +33,10 @@ export type RootState = {
 }
 
 export const rootReducer: Reducer<RootState, Action> = combineReducers({
+  context(state: EdgeContext | void, action: Action): EdgeContext {
+    if (state === undefined) throw new Error('This shoudl never happen')
+    return state
+  },
   create,
   login,
   passwordRecovery,

@@ -36,9 +36,10 @@ export class ReduxStore extends React.Component<Props> {
         ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({ name: 'login-ui' })
         : compose
 
+    const initalState: $Shape<RootState> = { context: imports.context }
     this.store = createStore(
       rootReducer,
-      undefined,
+      initalState,
       composeEnhancers(applyMiddleware(thunk.withExtraArgument(imports)))
     )
     // $FlowFixMe Flow doesn't know about thunks at this point.
