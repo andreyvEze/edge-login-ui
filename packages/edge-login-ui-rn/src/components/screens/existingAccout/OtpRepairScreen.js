@@ -96,7 +96,11 @@ class OtpRepairScreenComponent extends React.Component<Props> {
             <FontAwesome name="exclamation-triangle" size={theme.rem(2.5)} />
           )}
         >
-          <MessageText>{s.strings.otp_repair_header}</MessageText>
+          <MessageText>
+            {isIp
+              ? s.strings.otp_repair_header_ip
+              : s.strings.otp_repair_header_2fa}
+          </MessageText>
         </IconHeaderRow>
         <MessageText>{s.strings.otp_repair_options}</MessageText>
         <MessageText>{s.strings.otp_screen_approve}</MessageText>
